@@ -1,5 +1,8 @@
 import pandas as pd
-file_path = "/home/xlordplay/alfa_test_tasks/alfa_test/data/Input data/data_prep.tab"  
+import os
+  
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..','..'))
+file_path = os.path.join(root_dir, "data", "Input data", "data_prep.tab")
 
 df = pd.read_csv(file_path, sep="\t")
 df.sort_values(by=["CLIENT_ID", "SEGM_DATE"], inplace=True)
