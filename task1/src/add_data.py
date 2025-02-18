@@ -17,8 +17,8 @@ new_columns = []
 for col in original_columns:
     new_columns.append(col)
     if col in num_columns:
-        df[f"{col}_1"] = df.groupby("CLIENT_ID")[col].shift(1)  # Предыдущий месяц
-        df[f"{col}_2"] = df.groupby("CLIENT_ID")[col].shift(2)  # Предпредыдущий месяц
+        df[f"{col}_1"] = df.groupby("CLIENT_ID")[col].shift(1)  
+        df[f"{col}_2"] = df.groupby("CLIENT_ID")[col].shift(2)  
         new_columns.extend([f"{col}_1", f"{col}_2"])
 
 df = df[new_columns]
