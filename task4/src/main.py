@@ -184,12 +184,36 @@ model.solve()
 
 
 results = model.get_results()
-print(f"Total Profit: {results['Total Profit']:.2f}")
-print(f"Transport: {results['Transport']}")
-print(f"Closed Shops: {results['Closed Shops']}")
-print(f"Unallocated Candies: {results['Unallocated Candies']}")
-print(f"Unmet Demand: {results['Unmet Demand']}")
-print(f"Profitability: {results['Profitability']}")
+
+print("=" * 50)
+print("Candy Distribution Optimization Results")
+print("=" * 50)
+print(f"Total Profit: {results['Total Profit']:.2f} currency units")
+
+
+print("\nTransport Volume:")
+for (factory_id, shop_id), volume in results['Transport'].items():
+    print(f" - {factory_id} -> {shop_id}: {volume:.1f} candies")
+
+print("\nClosed Shops:")
+if results['Closed Shops']:
+    print(" - " + ", ".join(results['Closed Shops']))
+else:
+    print(" - No closed shops")
+
+print("\nUnallocated Candies by Factory:")
+for i, unallocated in enumerate(results['Unallocated Candies']):
+    print(f" - Factory {factories[i].id}: {unallocated:.1f} candies")
+
+print("\nUnmet Demand by Shop:")
+for j, unmet in enumerate(results['Unmet Demand']):
+    print(f" - Shop {shops[j].id}: {unmet:.1f} candies")
+
+print("\nProfitability of Open Shops:")
+for shop_id, profit in results['Profitability'].items():
+    print(f" - {shop_id}: {profit:.2f} currency units")
+
+print("=" * 50)
 
 
 model.visualize_results(results)
