@@ -57,18 +57,15 @@ class OptimizationModel:
 
         """
         profit = pulp.lpSum(
-            (
-                800 * pulp.lpSum(self.transport_vars[i, j] for i in range(len(self.factories))) -  #Revenue from candy sales
-                
-                (10000 * self.open_shop_vars[j]) -  #Fixed costs of open stores are subtracted
-                
-                (200 * pulp.lpSum(self.transport_vars[i, j] for i in range(len(self.factories)))) -  #Production and shipping costs are subtracted
-                
-                (20 * ((self.factories[i].x - shop.x)**2 + (self.factories[i].y - shop.y)**2)**0.5 * self.transport_vars[i, j])  #Shipping costs
-            )
-            for j, shop in enumerate(self.shops) 
-            for i, factory in enumerate(self.factories)
+        (
+            800 * self.transport_vars[i, j]  #Sales revenue
+            - 200 * self.transport_vars[i, j]  #Cost price
+            - 20 * ((self.factories[i].x - shop.x)**2 + (self.factories[i].y - shop.y)**2)**0.5 * self.transport_vars[i, j]  #Delivery
         )
+        for i, factory in enumerate(self.factories)
+        for j, shop in enumerate(self.shops)
+            ) - pulp.lpSum(10000 * self.open_shop_vars[j] for j in range(len(self.shops)))  #Shop rent
+
         self.model += profit
 
     def setup_constraints(self):
@@ -88,7 +85,9 @@ class OptimizationModel:
 
         #Demand constraints
         for j, shop in enumerate(self.shops):
+            self.model += pulp.lpSum(self.transport_vars[i, j] for i in range(len(self.factories))) <= shop.demand
             self.model += pulp.lpSum(self.transport_vars[i, j] for i in range(len(self.factories))) <= shop.demand * self.open_shop_vars[j]
+
 
 
     def solve(self):
@@ -133,7 +132,14 @@ class OptimizationModel:
             results["Unmet Demand"].append(unmet_demand)
 
             if self.open_shop_vars[j].varValue == 1:
-                profit_for_shop = (800 * min(self.shops[j].demand, pulp.value(pulp.lpSum(self.transport_vars[i, j] for i in range(len(self.factories))))) - 10000)
+                profit_for_shop = (
+                    800 * pulp.value(pulp.lpSum(self.transport_vars[i, j] for i in range(len(self.factories))))  #Revenue
+                    - 200 * pulp.value(pulp.lpSum(self.transport_vars[i, j] for i in range(len(self.factories))))  #Production
+                    - pulp.lpSum(20 * ((self.factories[i].x - self.shops[j].x)**2 + (self.factories[i].y - self.shops[j].y)**2)**0.5 * self.transport_vars[i, j] for i in range(len(self.factories)))  #Delivery
+                    - 10000  #rent
+                )
+
+                
                 results["Profitability"][self.shops[j].id] = profit_for_shop
 
         for i in range(len(self.factories)):
@@ -162,6 +168,7 @@ class OptimizationModel:
         shop_profits = list(profitability_data.values())
 
         plt.figure(figsize=(12, 6))
+        shop_profits = [pulp.value(profit) for profit in shop_profits]
         plt.bar(shop_labels, shop_profits, color='lightgreen')
         plt.xticks(rotation=45)
         plt.title('Profitability of Open Shops')
@@ -211,7 +218,7 @@ for j, unmet in enumerate(results['Unmet Demand']):
 
 print("\nProfitability of Open Shops:")
 for shop_id, profit in results['Profitability'].items():
-    print(f" - {shop_id}: {profit:.2f} currency units")
+    print(f" - {shop_id}: {pulp.value(profit)} currency units")
 
 print("=" * 50)
 
