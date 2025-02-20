@@ -22,8 +22,6 @@ with open(features_path, "r") as f:
     FEATURES = json.load(f)
 
 
-
-
 app = FastAPI()
 
 
@@ -42,30 +40,28 @@ class InputData(BaseModel):
     features: dict
 
 @app.post("/predict")
-def predict(data: InputData, threshold: float = 0.01):  # Параметр порога по умолчанию 0.5
+def predict(data: InputData, threshold: float = 0.27):  
     try:
-        # Логируем входные данные
+        
         print("Received features:", data.features)
 
-        # Проверяем, что все необходимые признаки переданы
-        if not all(feature in data.features for feature in FEATURES):
-            raise HTTPException(status_code=400, detail="Некорректные входные данные")
         
-        # Преобразуем входные данные в массив
+        if not all(feature in data.features for feature in FEATURES):
+            raise HTTPException(status_code=400, detail="INCORRECT DATA...")
+        
+        
         X = np.array([[data.features[f] for f in FEATURES]], dtype=np.float32)
         session = ort.InferenceSession(MODEL_PATH)
         input_name = session.get_inputs()[0].name
-        # Логируем массив для предсказания
+        
         print("Input array for prediction:", X)
 
-        # Предсказание
+        
         pred = session.run(None, {input_name: X})[0]
-        if pred == 0:
-            print("Warning: Predicted probability is 0.")
-        # Логируем предсказание
+        
         print("Raw prediction result:", pred[0])
 
-        # Применяем порог для классификации
+        
         prediction_class = 1 if pred[0] >= threshold else 0
         
         return {"prediction": prediction_class}
@@ -79,7 +75,7 @@ def predict(data: InputData, threshold: float = 0.01):  # Параметр по�
 with open(html_file_path, 'r') as file:
     html_content = file.read()
 
-# Теперь html_content содержит HTML из файла
+
 @app.get("/")
 def root():
     return FileResponse(html_file_path)
