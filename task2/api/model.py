@@ -4,10 +4,9 @@ import numpy as np
 import json
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from pathlib import Path
 import os
 from fastapi.responses import FileResponse
-from schemas import InputData
+from api.schemas import InputData
 
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
