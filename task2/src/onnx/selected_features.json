@@ -1,1 +1,1 @@
-["cc_trn_cnt", "cc_trn_cnt_1", "rel_age", "avg_bal_1", "dep_max_amt", "days_brtday", "cc_appr_amt", "cc_avg_bal_1", "customerID", "tr_min_bal", "cc_min_bal", "npv_trans", "reject", "tr_la_open_mth", "acc_funds", "npv_total", "prod_count", "cc_ea_open_mth", "acc_credit", "recency"]
+["equity_amt", "cc_trn_cnt_1", "rel_age", "cc_trn_cnt", "cc_avg_bal", "dep_max_amt", "cc_appr_amt", "customerID", "tr_min_bal", "npv_trans", "reject", "cc_min_bal", "cc_avg_bal_1", "tr_la_open_mth", "acc_funds", "npv_total", "acc_credit", "prod_count", "cc_ea_open_mth", "recency"]

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Binary Prediction</title>
+    <script>
+        async function sendData() {
+            let features = {};
+            document.querySelectorAll("input").forEach(input => {
+                features[input.name] = parseFloat(input.value) || 0;
+            });
+            
+            let response = await fetch("/predict", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({features})
+            });
+            
+            let result = await response.json();
+            document.getElementById("result").innerText = "Prediction: " + result.prediction;
+        }
+    </script>
+</head>
+<body>
+    <h2>Enter Features</h2>
+    <form onsubmit="event.preventDefault(); sendData();">
+        """ + "".join([f'<label>{f}: <input type="number" step="any" name="{f}"></label><br>' for f in FEATURES]) + """
+        <button type="submit">Predict</button>
+    </form>
+    <p id="result"></p>
+</body>
+</html>
