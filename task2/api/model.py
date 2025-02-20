@@ -1,5 +1,4 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 import onnxruntime as ort
 import numpy as np
 import json
@@ -8,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 import os
 from fastapi.responses import FileResponse
+from schemas import InputData
 
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -36,8 +36,6 @@ app.add_middleware(
 
 app.mount(html_file_path_for_mount, StaticFiles(directory=html_file_path_for_mount), name="static")
 
-class InputData(BaseModel):
-    features: dict
 
 @app.post("/predict")
 def predict(data: InputData, threshold: float = 0.27):  
